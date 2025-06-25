@@ -1,37 +1,41 @@
-const express = require('express')
-const cors = require('cors')
-const dotenv = require('dotenv')
-const DBConnection = require('./config/connect')
+const express = require("express");
+const cors = require("cors");
+const dotenv = require("dotenv");
 const path = require("path");
-const fs = require('fs')
+const fs = require("fs");
+const DBConnection = require("./config/connect");
 
-const app = express()
-dotenv.config()
+dotenv.config(); // Load environment variables
 
-//////connection of DB/////////
-DBConnection()
+const app = express();
+const PORT = process.env.PORT || 8000;
 
-const PORT = process.env.PORT 
+// Connect to MongoDB
+DBConnection();
 
+// Middleware
+app.use(cors());
+app.use(express.json()); // Parses JSON bodies
 
-//////middleware/////////
-app.use(express.json())
-app.use(cors())
-
+// Ensure uploads folder exists
 const uploadsDir = path.join(__dirname, "uploads");
-
-// Create uploads folder if it doesn’t exist
 if (!fs.existsSync(uploadsDir)) {
   fs.mkdirSync(uploadsDir);
 }
 
-app.use("/uploads", express.static(path.join(__dirname, "uploads")));
+// Serve uploaded video files statically
+app.use("/uploads", express.static(uploadsDir));
 
+// Routes
+app.use("/api/admin", require("./routers/adminRoutes"));
+app.use("/api/user", require("./routers/userRoutes"));
 
-///ROUTES///
-app.use('/api/admin', require('./routers/adminRoutes'))
-app.use('/api/user', require('./routers/userRoutes'))
+// Default route (optional)
+app.get("/", (req, res) => {
+  res.send("API is running...");
+});
 
-
-
-app.listen(PORT, () => console.log(`running on ${PORT}`))
+// Start server
+app.listen(PORT, () => {
+  console.log(`🚀 Server running on http://localhost:${PORT}`);
+});

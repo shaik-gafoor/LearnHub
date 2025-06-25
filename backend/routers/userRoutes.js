@@ -1,3 +1,4 @@
+
 const express = require("express");
 const multer = require("multer");
 const path = require("path");
@@ -18,6 +19,7 @@ const {
 
 const router = express.Router();
 
+// ✅ Define multer storage and file filter correctly
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
     cb(null, "./uploads/");
@@ -29,57 +31,47 @@ const storage = multer.diskStorage({
   },
 });
 
-const upload = multer({
-  storage: storage,
-  fileFilter: function (req, file, callback) {
-    var ext = path.extname(file.originalname);
-    if (ext !== ".mp4") {
-      return callback(new Error("Only .mp4 videos are allowed"));
-    }
-    callback(null, true);
+const fileFilter = function (req, file, callback) {
+  const ext = path.extname(file.originalname);
+  if (ext !== ".mp4") {
+    return callback(new Error("Only .mp4 videos are allowed"));
   }
-});
+  callback(null, true);
+};
 
+const upload = multer({ storage: storage, fileFilter: fileFilter });
+
+// ✅ Routes
 router.post("/register", registerController);
-
 router.post("/login", loginController);
-
 router.post(
   "/addcourse",
   authMiddleware,
-  // upload.single('C_image'),
   upload.array("S_content"),
   postCourseController
 );
-
 router.get("/getallcourses", getAllCoursesController);
-
 router.get(
   "/getallcoursesteacher",
   authMiddleware,
   getAllCoursesUserController
 );
-
 router.delete(
   "/deletecourse/:courseid",
   authMiddleware,
   deleteCourseController
 );
-
 router.post(
   "/enrolledcourse/:courseid",
   authMiddleware,
   enrolledCourseController
 );
-
 router.get(
   "/coursecontent/:courseid",
   authMiddleware,
   sendCourseContentController
 );
-
 router.post("/completemodule", authMiddleware, completeSectionController);
-
 router.get("/getallcoursesuser", authMiddleware, sendAllCoursesUserController);
 
 module.exports = router;

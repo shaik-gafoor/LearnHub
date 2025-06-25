@@ -1,41 +1,50 @@
 const mongoose = require("mongoose");
 
-const courseModel = mongoose.Schema(
+const sectionSchema = new mongoose.Schema({
+  title: String,
+  videos: [
+    {
+      title: String,
+      url: String,
+      duration: String,
+    },
+  ],
+});
+
+const courseSchema = new mongoose.Schema(
   {
     userId: {
-      type: String,
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "user",
       required: true,
     },
     C_educator: {
       type: String,
-      required: [true, "name is required"],
+      required: [true, "Educator name is required"],
     },
     C_title: {
       type: String,
-      required: [true, "C_title is required"],
+      required: [true, "Course title is required"],
     },
     C_categories: {
       type: String,
-      required: [true, "C_categories: is required"],
+      required: [true, "Course category is required"],
     },
     C_price: {
       type: String,
+      default: "Free",
     },
     C_description: {
       type: String,
-      required: [true, "C_description: is required"],
+      required: [true, "Course description is required"],
     },
-    sections: {},
+    sections: [sectionSchema],
     enrolled: {
       type: Number,
       default: 0,
     },
   },
-  {
-    timestamps: true,
-  }
+  { timestamps: true }
 );
 
-const courseSchema = mongoose.model("course", courseModel);
-
-module.exports = courseSchema;
+module.exports = mongoose.model("course", courseSchema);

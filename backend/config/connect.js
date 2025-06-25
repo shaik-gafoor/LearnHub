@@ -1,18 +1,19 @@
 const mongoose = require("mongoose");
+const dotenv = require("dotenv");
 
-const connectionOfDb = () => {
-  mongoose
-    .connect(process.env.MONGO_DB, {
-      dbName: 'video-course-application',
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
-    })
-    .then(() => {
-      console.log("Connected to MongoDB");
-    })
-    .catch((err) => {
-      throw new Error(`Could not connect to MongoDB: ${err}`);
+dotenv.config(); // Make sure environment variables are loaded
+
+const connectDB = async () => {
+  try {
+    await mongoose.connect(process.env.MONGO_DB, {
+      dbName: "video-course-application",
     });
+
+    console.log(" MongoDB connected successfully");
+  } catch (error) {
+    console.error(" MongoDB connection failed:", error.message);
+    process.exit(1); // Exit the process with failure
+  }
 };
 
-module.exports = connectionOfDb;
+module.exports = connectDB;

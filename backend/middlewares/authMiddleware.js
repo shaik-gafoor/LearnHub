@@ -2,26 +2,28 @@ const jwt = require("jsonwebtoken");
 
 module.exports = async (req, res, next) => {
   try {
-    const authorizationHeader = req.headers["authorization"];
-    if (!authorizationHeader) {
+    const authHeader = req.headers["authorization"];
+    if (!authHeader || !authHeader.startsWith("Bearer ")) {
       return res
         .status(401)
-        .send({ message: "Authorization header missing", success: false });
+        .json({ message: "Authorization token missing", success: false });
     }
 
-    const token = req.headers["authorization"].split(" ")[1];
-    jwt.verify(token, process.env.JWT_KEY, (err, decode) => {
+    const token = authHeader.split(" ")[1];
+
+    jwt.verify(token, process.env.JWT_KEY, (err, decoded) => {
       if (err) {
         return res
-          .status(200)
-          .send({ message: "Token is not valid", success: false });
-      } else {
-        req.body.userId = decode.id;
-        next();
+          .status(401)
+          .json({ message: "Invalid or expired token", success: false });
       }
+
+      // Attach user ID to the request object safely
+      req.userId = decoded.id;
+      next();
     });
   } catch (error) {
-    console.error(error); // Handle or log the error appropriately
-    res.status(500).send({ message: "Internal server error", success: false });
+    console.error("Auth Middleware Error:", error);
+    res.status(500).json({ message: "Internal server error", success: false });
   }
 };

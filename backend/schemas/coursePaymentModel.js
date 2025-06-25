@@ -1,40 +1,41 @@
 const mongoose = require("mongoose");
 
-const coursePaymentModel = mongoose.Schema(
+const coursePaymentSchema = new mongoose.Schema(
   {
     userId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "user",
+      required: true,
     },
     courseId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "course",
+      required: true,
     },
+    paymentReference: {
+      type: String,
+      default: function () {
+        return `REF-${Date.now()}`;
+      },
+    },
+    // Simulated card meta (NEVER use real info)
     cardDetails: {
-      cardholdername: {
+      maskedNumber: {
         type: String,
+        default: "**** **** **** 1234",
       },
-      cardnumber: {
-        type: Number,
-      },
-      cvvcode: {
-        type: Number,
-      },
-      expmonthyear: {
+      method: {
         type: String,
+        default: "Credit Card",
       },
     },
     status: {
       type: String,
+      enum: ["enrolled", "pending", "failed"],
       default: "enrolled",
     },
   },
-  {
-    timestamps: true,
-    strict: false,
-  }
+  { timestamps: true }
 );
 
-const coursePaymentSchema = mongoose.model("coursePayment", coursePaymentModel);
-
-module.exports = coursePaymentSchema;
+module.exports = mongoose.model("coursePayment", coursePaymentSchema);
