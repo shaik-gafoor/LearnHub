@@ -22,7 +22,7 @@ const Register = () => {
 
   const handleSelect = (eventKey) => {
     setSelectedOption(eventKey);
-    setData({ ...data, type: eventKey });
+    setData({ ...data, type: eventKey.toLowerCase() });
   };
 
   const handleChange = (e) => {
@@ -137,10 +137,10 @@ const Register = () => {
                   {selectedOption}
                 </Dropdown.Toggle>
                 <Dropdown.Menu>
-                  <Dropdown.Item onClick={() => handleSelect("Student")}>
-                    Student
+                  <Dropdown.Item onClick={() => handleSelect("student")}>
+                    student
                   </Dropdown.Item>
-                  <Dropdown.Item onClick={() => handleSelect("Teacher")}>
+                  <Dropdown.Item onClick={() => handleSelect("teacher")}>
                     Teacher
                   </Dropdown.Item>
                 </Dropdown.Menu>

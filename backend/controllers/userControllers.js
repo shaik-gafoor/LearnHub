@@ -38,9 +38,10 @@ const loginController = async (req, res) => {
         .status(401)
         .send({ message: "Invalid credentials", success: false });
     }
+    console.log("Found User", user);
 
     const token = jwt.sign({ id: user._id }, process.env.JWT_KEY, {
-      expiresIn: "1d",
+      expiresIn: "30d",
     });
     const userData = user.toObject();
     delete userData.password;
